@@ -1,1 +1,2 @@
-from .modeldir.userProfile import UserProfile
+# Import all models here
+from ._models.userProfile import UserProfile
