@@ -1,27 +1,14 @@
 from flask import Flask, jsonify
+from flask_restful import Api, Resource
 
 app = Flask(__name__)
+api = Api(app)
 
-stores = [
-    {
-        'name': '1',
-        'data': 'store 1 data'
-    },
-    {
-        'name': '2',
-        'data': 'store 2 data'
-    },
-    {
-        'name': '3',
-        'data': 'store 3 data'
-    }
-]
+class HelloWorld(Resource):
+    def get(self):
+        return {'hello': 'world!'}
 
+api.add_resource(HelloWorld, '/')
 
-@app.route('/store/<string:name>', methods=['GET'])
-def get_stores(name):
-    for store in stores:
-        if store['name'] == name:
-            return jsonify(store)
-
-app.run(port=8000, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
