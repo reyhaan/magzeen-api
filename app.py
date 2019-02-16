@@ -27,6 +27,14 @@ class Item(Resource):
         items.append(item)
         return item, 201
 
+    def delete(self, name):
+        global items
+        items = list(filter(lambda x: x['name'] != name, items))
+        return {'message': 'item deleted!'}
+
+    def put(self):
+        pass
+
 api.add_resource(Item, '/item/<string:name>')
 
 if __name__ == '__main__':
