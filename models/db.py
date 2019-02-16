@@ -48,19 +48,19 @@ def dbSetup():
     try:
         r.db_create(RDB_CONFIG['db']).run(conn)
         r.db(RDB_CONFIG['db']).table_create(
-          RDB_CONFIG['table']['users']).run(conn)
+            RDB_CONFIG['table']['users']).run(conn)
         r.db(RDB_CONFIG['db']).table_create(
-          RDB_CONFIG['table']['posts']).run(conn)
+            RDB_CONFIG['table']['posts']).run(conn)
         r.db(RDB_CONFIG['db']).table_create(
-          RDB_CONFIG['table']['reactions']).run(conn)
+            RDB_CONFIG['table']['reactions']).run(conn)
         r.db(RDB_CONFIG['db']).table_create(
-          RDB_CONFIG['table']['comments']).run(conn)
+            RDB_CONFIG['table']['comments']).run(conn)
         r.db(RDB_CONFIG['db']).table_create(
-          RDB_CONFIG['table']['sections']).run(conn)
+            RDB_CONFIG['table']['sections']).run(conn)
         print('Database setup completed. Now run the app without --setup.')
     except RqlRuntimeError:
         print(
-          'App database already exists. Run the app like this: ',
-          'python app.py')
+            'App database already exists. Run the app like this: ',
+            'python app.py')
     finally:
         conn.close()

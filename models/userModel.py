@@ -1,6 +1,6 @@
 import time
 import rethinkdb as r
-import db
+from models import db
 
 
 def getUser(self):
@@ -11,7 +11,7 @@ def deleteUser(self):
     return 'user deleted'
 
 
-def addUser(self, username, password):
+def addUser(username, password):
     new_user = {
         'username': username,
         'password': password,
