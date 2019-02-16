@@ -1,7 +1,9 @@
+import argparse
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource, reqparse
 from flask_jwt import JWT, jwt_required
 from security import authenticate, identity
+from models import db
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -52,5 +54,12 @@ class Item(Resource):
 
 api.add_resource(Item, '/item/<string:name>')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Run the app.py blog app')
+    parser.add_argument('--setup', dest='run_setup', action='store_true')
+
+    args = parser.parse_args()
+    if args.run_setup:
+        db.dbSetup()
+    else:
+        app.run(debug=True)
