@@ -11,22 +11,22 @@ RDB_CONFIG = {
     'port': os.getenv('RDB_PORT', 28015),
     'db': os.getenv('RDB_DB', 'magzeen'),
     'table': {
-        'users': 'users', 
-        'posts': 'posts', 
-        'reactions': 'reactions', 
-        'comments': 'comments', 
+        'users': 'users',
+        'posts': 'posts',
+        'reactions': 'reactions',
+        'comments': 'comments',
         'sections': 'sections'
     }
 }
 
 
-# The `Connection` object returned by [`r.connect`](http://www.rethinkdb.com/api/python/connect/) 
+# The `Connection` object returned by [`r.connect`](http://www.rethinkdb.com/api/python/connect/)
 # is a [context manager](http://docs.python.org/2/library/stdtypes.html#typecontextmanager)
 # that can be used with the `with` statements.
 def connection():
     return r.connect(
-        host=RDB_CONFIG['host'], 
-        port=RDB_CONFIG['port'], 
+        host=RDB_CONFIG['host'],
+        port=RDB_CONFIG['port'],
         db=RDB_CONFIG['db']
     )
 
@@ -34,14 +34,14 @@ def connection():
 # Database setup
 
 
-# The app will use the table `blogposts` in the database `webpy`. 
+# The app will use the table `blogposts` in the database `webpy`.
 # You can override these defaults by defining the `RDB_DB` and `RDB_TABLE`
 # env variables.
-# 
+#
 # We'll create the database and table here using
 # [`db_create`](http://www.rethinkdb.com/api/python/db_create/)
 # and
-# [`table_create`](http://www.rethinkdb.com/api/python/table_create/) 
+# [`table_create`](http://www.rethinkdb.com/api/python/table_create/)
 # commands.
 def dbSetup():
     conn = r.connect(host=RDB_CONFIG['host'], port=RDB_CONFIG['port'])
