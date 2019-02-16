@@ -1,17 +1,22 @@
-import os, socket, sys, time
-from contextlib import contextmanager
+import os
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError
 
-#### Connection details
+# Connection details
 
 # We will use these settings later in the code to
 # connect to the RethinkDB server.
 RDB_CONFIG = {
-  'host' : os.getenv('RDB_HOST', 'localhost'),
-  'port' : os.getenv('RDB_PORT', 28015),
-  'db'   : os.getenv('RDB_DB', 'magzeen'),
-  'table': os.getenv('RDB_TABLE', 'posts')
+    'host': os.getenv('RDB_HOST', 'localhost'),
+    'port': os.getenv('RDB_PORT', 28015),
+    'db': os.getenv('RDB_DB', 'magzeen'),
+    'table': {
+        'users': 'users', 
+        'posts': 'posts', 
+        'reactions': 'reactions', 
+        'comments': 'comments', 
+        'sections': 'sections'
+    }
 }
 
 
@@ -19,11 +24,14 @@ RDB_CONFIG = {
 # is a [context manager](http://docs.python.org/2/library/stdtypes.html#typecontextmanager)
 # that can be used with the `with` statements.
 def connection():
-  return r.connect(host=RDB_CONFIG['host'], port=RDB_CONFIG['port'],
-                   db=RDB_CONFIG['db'])
+    return r.connect(
+        host=RDB_CONFIG['host'], 
+        port=RDB_CONFIG['port'], 
+        db=RDB_CONFIG['db']
+    )
 
 
-#### Database setup
+# Database setup
 
 
 # The app will use the table `blogposts` in the database `webpy`. 
@@ -39,10 +47,20 @@ def dbSetup():
     conn = r.connect(host=RDB_CONFIG['host'], port=RDB_CONFIG['port'])
     try:
         r.db_create(RDB_CONFIG['db']).run(conn)
-        r.db(RDB_CONFIG['db']).table_create(RDB_CONFIG['table']).run(conn)
-        print ('Database setup completed. Now run the app without --setup.')
+        r.db(RDB_CONFIG['db']).table_create(
+          RDB_CONFIG['table']['users']).run(conn)
+        r.db(RDB_CONFIG['db']).table_create(
+          RDB_CONFIG['table']['posts']).run(conn)
+        r.db(RDB_CONFIG['db']).table_create(
+          RDB_CONFIG['table']['reactions']).run(conn)
+        r.db(RDB_CONFIG['db']).table_create(
+          RDB_CONFIG['table']['comments']).run(conn)
+        r.db(RDB_CONFIG['db']).table_create(
+          RDB_CONFIG['table']['sections']).run(conn)
+        print('Database setup completed. Now run the app without --setup.')
     except RqlRuntimeError:
-        print ('App database already exists. Run the app like this: ',
-               'python blog.py')
+        print(
+          'App database already exists. Run the app like this: ',
+          'python app.py')
     finally:
         conn.close()
