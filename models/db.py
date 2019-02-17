@@ -1,66 +1,93 @@
-import os
-import rethinkdb as r
-from rethinkdb.errors import RqlRuntimeError
+import psycopg2
+from models import config
 
-# Connection details
-
-# We will use these settings later in the code to
-# connect to the RethinkDB server.
-RDB_CONFIG = {
-    'host': os.getenv('RDB_HOST', 'localhost'),
-    'port': os.getenv('RDB_PORT', 28015),
-    'db': os.getenv('RDB_DB', 'magzeen'),
-    'table': {
-        'users': 'users',
-        'posts': 'posts',
-        'reactions': 'reactions',
-        'comments': 'comments',
-        'sections': 'sections'
-    }
-}
-
-
-# The `Connection` object returned by [`r.connect`](http://www.rethinkdb.com/api/python/connect/)
-# is a [context manager](http://docs.python.org/2/library/stdtypes.html#typecontextmanager)
-# that can be used with the `with` statements.
-def connection():
-    return r.connect(
-        host=RDB_CONFIG['host'],
-        port=RDB_CONFIG['port'],
-        db=RDB_CONFIG['db']
-    )
-
-
-# Database setup
-
-
-# The app will use the table `blogposts` in the database `webpy`.
-# You can override these defaults by defining the `RDB_DB` and `RDB_TABLE`
-# env variables.
-#
-# We'll create the database and table here using
-# [`db_create`](http://www.rethinkdb.com/api/python/db_create/)
-# and
-# [`table_create`](http://www.rethinkdb.com/api/python/table_create/)
-# commands.
-def dbSetup():
-    conn = r.connect(host=RDB_CONFIG['host'], port=RDB_CONFIG['port'])
+def connect():
+    """ Connect to the PostgreSQL database server """
+    conn = None
     try:
-        r.db_create(RDB_CONFIG['db']).run(conn)
-        r.db(RDB_CONFIG['db']).table_create(
-            RDB_CONFIG['table']['users']).run(conn)
-        r.db(RDB_CONFIG['db']).table_create(
-            RDB_CONFIG['table']['posts']).run(conn)
-        r.db(RDB_CONFIG['db']).table_create(
-            RDB_CONFIG['table']['reactions']).run(conn)
-        r.db(RDB_CONFIG['db']).table_create(
-            RDB_CONFIG['table']['comments']).run(conn)
-        r.db(RDB_CONFIG['db']).table_create(
-            RDB_CONFIG['table']['sections']).run(conn)
-        print('Database setup completed. Now run the app without --setup.')
-    except RqlRuntimeError:
-        print(
-            'App database already exists. Run the app like this: ',
-            'python app.py')
+        # read connection parameters
+        params = config()
+
+        # connect to the PostgreSQL server
+        print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(**params)
+
+        return conn
+
+        # # create a cursor
+        # cur = conn.cursor()
+
+        # # execute a statement
+        # print('PostgreSQL database version:')
+        # cur.execute('SELECT version()')
+
+        # # display the PostgreSQL database server version
+        # db_version = cur.fetchone()
+        # print(db_version)
+
+        # # close the communication with the PostgreSQL
+        # cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
+
+
+def dbSetup():
+    """ create tables in the PostgreSQL database"""
+    commands = (
+        """
+        CREATE TABLE vendors (
+            vendor_id SERIAL PRIMARY KEY,
+            vendor_name VARCHAR(255) NOT NULL
+        )
+        """,
+        """ CREATE TABLE parts (
+                part_id SERIAL PRIMARY KEY,
+                part_name VARCHAR(255) NOT NULL
+                )
+        """,
+        """
+        CREATE TABLE part_drawings (
+                part_id INTEGER PRIMARY KEY,
+                file_extension VARCHAR(5) NOT NULL,
+                drawing_data BYTEA NOT NULL,
+                FOREIGN KEY (part_id)
+                REFERENCES parts (part_id)
+                ON UPDATE CASCADE ON DELETE CASCADE
+        )
+        """,
+        """
+        CREATE TABLE vendor_parts (
+                vendor_id INTEGER NOT NULL,
+                part_id INTEGER NOT NULL,
+                PRIMARY KEY (vendor_id , part_id),
+                FOREIGN KEY (vendor_id)
+                    REFERENCES vendors (vendor_id)
+                    ON UPDATE CASCADE ON DELETE CASCADE,
+                FOREIGN KEY (part_id)
+                    REFERENCES parts (part_id)
+                    ON UPDATE CASCADE ON DELETE CASCADE
+        )
+        """)
+    conn = None
+    try:
+        # read the connection parameters
+        params = config()
+        # connect to the PostgreSQL server
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        # create table one by one
+        for command in commands:
+            cur.execute(command)
+        # close communication with the PostgreSQL database server
+        cur.close()
+        # commit the changes
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()

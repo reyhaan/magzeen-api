@@ -1,7 +1,6 @@
 import time
-import rethinkdb as r
-from models import db
-
+from models import db, config
+import psycopg2
 
 def getUser(self):
     return 'a user'
@@ -12,18 +11,30 @@ def deleteUser(self):
 
 
 def addUser(username, password):
-    new_user = {
-        'username': username,
-        'password': password,
-        'created_at': time.time(),
-        'updated_at': time.time()
-    }
-    with db.connection() as conn:
-        result = r.table(
-            db.RDB_CONFIG['table']['users']
-        ).insert(new_user).run(conn)
-        if result['inserted'] == 1:
-            new_user['id'] = result['generated_keys'][0]
-            return new_user
-        else:
-            return None
+    """ insert a new vendor into the vendors table """
+    sql = """UPDATE users SET username = %s
+             WHERE user_id=1 RETURNING user_id;"""
+    conn = None
+    user_id = None
+    try:
+        # read database configuration
+        params = config.config()
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(**params)
+        # create a new cursor
+        cur = conn.cursor()
+        # execute the INSERT statement
+        cur.execute(sql, (username,))
+        # get the generated id back
+        user_id = cur.fetchone()[0]
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return user_id
