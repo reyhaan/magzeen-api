@@ -1,7 +1,9 @@
 import time
 from models import db, config
 import psycopg2
+import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
+from utils.queryUtils import generate_update_query
 
 class UserModel:
 
@@ -84,8 +86,22 @@ class UserModel:
         return user
 
     @classmethod
-    def update_user(cls):
-        pass
+    def update_user(cls, columns, id):
+        sql = generate_update_query(columns, id)
+        conn = None
+        user = None
+        try:
+            conn, cur = db.connect()
+            cur.execute(sql)
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return user
 
     @classmethod
     def verify_user(cls, email, password):
@@ -111,7 +127,7 @@ class UserModel:
         return count
 
     @classmethod
-    def check_if_user_exists(cls, email):
+    def check_if_user_exists_by_email(cls, email):
         sql = """SELECT * FROM users WHERE email=%s"""
         conn = None
         count = 0
@@ -142,9 +158,7 @@ class UserModel:
         try:
             conn, cur = db.connect()
             cur.execute(sql, (email, password,))
-            row = cur.fetchone()
-            print(row)
-            user = row[0]
+            user = cur.fetchone()
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:

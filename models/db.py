@@ -1,4 +1,5 @@
 import psycopg2
+import psycopg2.extras
 from models import config
 
 def connect():
@@ -9,7 +10,7 @@ def connect():
         conn = psycopg2.connect(**params)
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    return conn, conn.cursor()
+    return conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
 def dbSetup():
@@ -55,7 +56,7 @@ def dbSetup():
         params = config()
         # connect to the PostgreSQL server
         conn = psycopg2.connect(**params)
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         # create table one by one
         for command in commands:
             cur.execute(command)
