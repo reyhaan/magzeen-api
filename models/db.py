@@ -1,6 +1,9 @@
 import psycopg2
 import psycopg2.extras
+from flask_sqlalchemy import SQLAlchemy
 from models import config
+
+sqlalchemy = SQLAlchemy()
 
 def connect():
     """ Connect to the PostgreSQL database server """
@@ -10,7 +13,7 @@ def connect():
         conn = psycopg2.connect(**params)
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    return conn, conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    return conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
 
 def dbSetup():

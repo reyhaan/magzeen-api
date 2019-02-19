@@ -6,7 +6,7 @@ def generate_update_query(columns, id):
     return_string = ""
     count = len(columns)
     for key, value in columns.items():
-        if not isinstance(value, int):
+        if not isinstance(value, int):  # wrapping single quotes around string values for SQL statement
             value = wrap_single_quotes(value)
         if count and count != 1:
             set_string += key + " = " + value + ","

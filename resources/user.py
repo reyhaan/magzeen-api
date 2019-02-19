@@ -1,15 +1,10 @@
 import json
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_restful import Resource, reqparse
+from flask_api import status
 from flask_jwt import jwt_required
 from models.userModel import UserModel
-
-items = [
-    {'name': '1', 'data': 'keyboard'},
-    {'name': '2', 'data': 'mouse'},
-    {'name': '3', 'data': 'laptop'}
-]
-
+from utils.reponseUtils import send_error, send_success, DateTimeEncoder
 
 class UserRegister(Resource):
 
@@ -38,32 +33,41 @@ class UserRegister(Resource):
         new_user = user_object.check_if_user_exists(email)
         if new_user == 0:
             new_user = user_object.add_user(email, password)
-            return new_user, 201
+            return send_success('user created', new_user, 201)
         else:
-            return 'user already exists', 409
+            return send_error('user already exists', status.HTTP_409_CONFLICT)
 
 class User(Resource):
 
-    parser = reqparse.RequestParser()
+    user_object = UserModel()
 
-    @jwt_required()
-    def get(self, name):
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        return {'item': item}, 200 if item else 404
+    def get(self, id):
+        user_exists = User.user_object.check_if_user_exists_by_id(id)
+        if not user_exists:
+            return send_error('user does not exist', status.HTTP_404_NOT_FOUND)
+        else:
+            user = User.user_object.find_user_by_id(id)
+            if user:
+                return jsonify(user)
 
-    def delete(self, name):
-        global items
-        items = list(filter(lambda x: x['name'] != name, items))
-        return {'message': 'item deleted!'}
+    def delete(self, id):
+        user_exists = User.user_object.check_if_user_exists_by_id(id)
+        if not user_exists:
+            return send_error('user does not exist', status.HTTP_400_BAD_REQUEST)
+
+        is_deleted = User.user_object.delete_user(id)
+
+        if is_deleted:
+            return send_success('deleted', None, 204)
+        else:
+            return send_error('something went wrong', status.HTTP_400_BAD_REQUEST)
 
     def put(self, id):
         # check if user already exixsts
-        user_object = UserModel()
-        user = user_object.find_user_by_id(id)
-        new_user = user_object.check_if_user_exists_by_email(user['email'])
+        new_user = User.user_object.check_if_user_exists_by_id(id)
         if new_user == 0:
-            return 'user does not exist', 409
+            return send_error('user does not exist', status.HTTP_409_CONFLICT)
         else:
             data = json.loads(request.data)
-            new_user = user_object.update_user(data, user['user_id'])
-            return new_user, 200
+            new_user = User.user_object.update_user(data, id)
+            return send_success('success', new_user, 200)
