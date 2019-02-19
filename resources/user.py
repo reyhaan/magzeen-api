@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
-from models import userModel
+from models.userModel import UserModel
 
 items = [
     {'name': '1', 'data': 'keyboard'},
@@ -14,10 +14,10 @@ class UserRegister(Resource):
     parser = reqparse.RequestParser()
 
     parser.add_argument(
-        'username',
+        'email',
         type=str,
         required=True,
-        help='username cannot be left blank!'
+        help='email cannot be left blank!'
     )
 
     parser.add_argument(
@@ -29,11 +29,16 @@ class UserRegister(Resource):
 
     def post(self):
         data = UserRegister.parser.parse_args()
-        username = data['username']
+        email = data['email']
         password = data['password']
-        user = userModel.addUser(username, password)
-        return user, 201
-
+        user = UserModel(email, password)
+        # check if user already exixsts
+        new_user = user.check_if_user_exists(email)
+        if new_user == 0:
+            new_user = user.add_user(email, password)
+            return new_user, 201
+        else:
+            return 'user already exists', 409
 
 class User(Resource):
 
