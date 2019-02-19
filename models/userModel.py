@@ -89,10 +89,11 @@ class UserModel:
     def update_user(cls, columns, id):
         sql = generate_update_query(columns, id)
         conn = None
-        user = None
+        data = None
         try:
             conn, cur = db.connect()
             cur.execute(sql)
+            data = cur.fetchone()
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -101,7 +102,7 @@ class UserModel:
             if conn is not None:
                 conn.close()
 
-        return user
+        return data
 
     @classmethod
     def verify_user(cls, email, password):

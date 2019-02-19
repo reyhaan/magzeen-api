@@ -66,3 +66,4 @@ class User(Resource):
         else:
             data = json.loads(request.data)
             new_user = user_object.update_user(data, user['user_id'])
+            return new_user, 200
