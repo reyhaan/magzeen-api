@@ -54,8 +54,7 @@ class UserModel:
         count = 0
         user = None
         try:
-            conn = db.connect()
-            cur = conn.cursor()
+            conn, cur = db.connect()
             cur.execute(sql, (email,))
             user = cur.fetchone()
             if user is not None:
@@ -79,8 +78,7 @@ class UserModel:
         conn = None
         user = None
         try:
-            conn = db.connect()
-            cur = conn.cursor()
+            conn, cur = db.connect()
             cur.execute(sql, (email, password,))
             row = cur.fetchone()
             print(row)

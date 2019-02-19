@@ -9,7 +9,7 @@ def connect():
         conn = psycopg2.connect(**params)
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    return conn
+    return conn, conn.cursor()
 
 
 def dbSetup():
