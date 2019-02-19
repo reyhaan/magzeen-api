@@ -33,7 +33,7 @@ class UserRegister(Resource):
         new_user = user_object.check_if_user_exists(email)
         if new_user == 0:
             new_user = user_object.add_user(email, password)
-            return send_success('user created', new_user, 201)
+            return send_success('user created', new_user, status.HTTP_201_CREATED)
         else:
             return send_error('user already exists', status.HTTP_409_CONFLICT)
 
@@ -48,7 +48,7 @@ class User(Resource):
         else:
             user = User.user_object.find_user_by_id(id)
             if user:
-                return jsonify(user)
+                return send_success('success', user, status.HTTP_200_OK)
 
     def delete(self, id):
         user_exists = User.user_object.check_if_user_exists_by_id(id)
@@ -58,7 +58,7 @@ class User(Resource):
         is_deleted = User.user_object.delete_user(id)
 
         if is_deleted:
-            return send_success('deleted', None, 204)
+            return send_success('success', None, status.HTTP_200_OK)
         else:
             return send_error('something went wrong', status.HTTP_400_BAD_REQUEST)
 
@@ -70,4 +70,4 @@ class User(Resource):
         else:
             data = json.loads(request.data)
             new_user = User.user_object.update_user(data, id)
-            return send_success('success', new_user, 200)
+            return send_success('success', new_user, status.HTTP_200_OK)

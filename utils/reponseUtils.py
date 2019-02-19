@@ -4,16 +4,10 @@ from flask_api import status
 from flask import make_response, jsonify
 
 def send_error(msg, code):
-    return make_response(jsonify(message=msg, error=True, success=False, code=code), code)
+    return make_response(jsonify(message=msg, code=code, error=True, success=False), code)
 
 def send_success(msg, data, code):
-    return {
-        'error': False,
-        'success': True,
-        'message': msg,
-        'data': data,
-        'code': code
-    }, code
+    return make_response(jsonify(message=msg, data=data, code=code, error=False, success=True), code)
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
