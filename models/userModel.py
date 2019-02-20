@@ -1,5 +1,5 @@
 import time
-from models import db, config
+from database import db, config
 import psycopg2
 import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -40,7 +40,7 @@ class UserModel():
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
+            return error
         finally:
             if conn is not None:
                 conn.close()

@@ -1,9 +1,6 @@
 import psycopg2
 import psycopg2.extras
-from flask_sqlalchemy import SQLAlchemy
-from models import config
-
-sqlalchemy = SQLAlchemy()
+from database import config
 
 def connect():
     """ Connect to the PostgreSQL database server """

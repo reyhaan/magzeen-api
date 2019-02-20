@@ -4,16 +4,15 @@ from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
 
-from models import db
+from database import db
 from resources.item import Item
 from resources.user import User, UserRegister
-from security import authenticate, identity
 
 app = Flask(__name__)
 app.secret_key = 'secret'
 api = Api(app)
 
-jwt = JWT(app, authenticate, identity)
+# jwt = JWT(app)
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(User, '/user/<int:id>')
