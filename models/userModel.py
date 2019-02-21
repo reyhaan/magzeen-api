@@ -4,6 +4,8 @@ import psycopg2
 import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils.queryUtils import generate_update_query
+from werkzeug.security import safe_str_cmp
+from utils.queryUtils import wrap_single_quotes
 
 class UserModel():
 
@@ -27,6 +29,25 @@ class UserModel():
         self.last_name = last_name
         self.domain_name = domain_name
         self.company_name = company_name
+
+    @classmethod
+    def get_user_type(cls, email):
+        sql = """SELECT type FROM users WHERE email=%s"""
+        conn = None
+        user_type = None
+        try:
+            conn, cur = db.connect()
+            cur.execute(sql, (email,))
+            user_type = cur.fetchone()['type']
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            return error
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return user_type
 
     @classmethod
     def find_user_by_id(cls, id):
@@ -105,18 +126,18 @@ class UserModel():
         return data
 
     @classmethod
-    def verify_user(cls, email, password):
-        sql = """SELECT * FROM users WHERE email=%s AND password=%s"""
+    def verify_password(cls, email, _password):
+        sql = """SELECT password FROM users WHERE email=%s"""
         conn = None
-        user = None
+        password = None
         count = 0
-        password = check_password_hash(password)
+        is_correct = False
         try:
             conn, cur = db.connect()
-            cur.execute(sql, (email, password))
-            user = cur.fetchone()
-            if user is not None:
-                count = len(user)
+            cur.execute(sql, (email,))
+            password_hash = cur.fetchone()
+            if check_password_hash(password_hash['password'], _password):
+                is_correct = True
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -125,11 +146,36 @@ class UserModel():
             if conn is not None:
                 conn.close()
 
-        return count
+        return is_correct
+
+    @classmethod
+    def verify_user(cls, email, _password):
+        sql = """SELECT user_id, first_name, last_name, email, type, company_name, domain_name FROM users WHERE email=%s"""
+        conn = None
+        user = None
+        count = 0
+        is_password_correct = cls.verify_password(email, _password)
+
+        if not is_password_correct:
+            return count
+
+        try:
+            conn, cur = db.connect()
+            cur.execute(sql, (email,))
+            user = cur.fetchone()
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return user
 
     @classmethod
     def check_if_user_exists_by_email(cls, email):
-        sql = """SELECT * FROM users WHERE email=%s"""
+        sql = """SELECT user_id FROM users WHERE email=%s"""
         conn = None
         count = 0
         user = None

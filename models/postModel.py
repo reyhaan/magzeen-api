@@ -11,7 +11,7 @@
 # # command to query the database in response to a GET request from the
 # # browser. We also [`order_by`](http://www.rethinkdb.com/api/python/order_by/)
 # # the `posted_at` attribute in a descending manner.
-# #    
+# #
 # # Running the query returns an iterator that automatically streams
 # # data from the server in efficient batches.
 # def get_posts():
@@ -37,8 +37,8 @@
 # # }
 # # ```
 # def new_post(title, text):
-#   new_post = {'title': title, 
-#     'content': text, 
+#   new_post = {'title': title,
+#     'content': text,
 #     'posted_at': time.time(),
 #     'last_modified': time.time()
 #   }
@@ -63,7 +63,7 @@
 
 # #### Updating a post
 
-# # To update the post we'll use the 
+# # To update the post we'll use the
 # # [`update`](http://www.rethinkdb.com/api/python/update/)
 # # command, which will merge the JSON object stored in the database with the
 # # new one.
