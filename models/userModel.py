@@ -1,11 +1,13 @@
 import time
-from database import db, config
+
 import psycopg2
 import psycopg2.extras
-from werkzeug.security import generate_password_hash, check_password_hash
-from utils.queryUtils import generate_update_query
-from werkzeug.security import safe_str_cmp
-from utils.queryUtils import wrap_single_quotes
+from werkzeug.security import (check_password_hash, generate_password_hash,
+                               safe_str_cmp)
+
+from database import config, db
+from utils.queryUtils import generate_update_query, wrap_single_quotes
+
 
 class UserModel():
 

@@ -9,6 +9,7 @@ from database import db
 from resources.item import Item
 from resources.user import User, UserRegister, UserLogin, UserLogout
 from resources.tokenRefresh import TokenRefresh
+from resources.team import Team
 
 from models.userModel import UserModel
 
@@ -44,12 +45,15 @@ def add_claims_to_jwt(identity):
 
     return jwt_claim
 
+api.add_resource(Team, '/<string:team_id>')
 api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogout, '/logout')
+api.add_resource(TokenRefresh, '/refresh')
 api.add_resource(UserRegister, '/signup')
 api.add_resource(User, '/user/<int:id>')
+
+# example resource
 api.add_resource(Item, '/item/<string:name>')
-api.add_resource(TokenRefresh, '/refresh')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run the app.py blog app')

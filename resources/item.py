@@ -11,7 +11,8 @@ items = [
 class Item(Resource):
 
     parser = reqparse.RequestParser()
-    parser.add_argument('price',
+    parser.add_argument(
+        'price',
         type=float,
         required=True,
         help='This field cannot be left blank!'
@@ -21,7 +22,7 @@ class Item(Resource):
     def get(self, name):
         item = next(filter(lambda x: x['name'] == name, items), None)
         return {'item': item}, 200 if item else 404
-    
+
     def post(self, name):
         data = request.get_json()
         item = {'name': data['name'], 'data': data['desc']}
