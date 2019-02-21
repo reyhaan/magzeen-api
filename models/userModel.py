@@ -53,7 +53,16 @@ class UserModel():
 
     @classmethod
     def find_user_by_id(cls, id):
-        sql = """SELECT user_id, email, first_name, last_name, type, company_name, domain_name FROM users WHERE user_id=%s"""
+        sql = """SELECT
+                user_id,
+                email,
+                first_name,
+                last_name,
+                type,
+                company_name,
+                domain_name
+
+                FROM users WHERE user_id=%s"""
         conn = None
         user = None
         try:
@@ -152,7 +161,15 @@ class UserModel():
 
     @classmethod
     def verify_user(cls, email, _password):
-        sql = """SELECT user_id, first_name, last_name, email, type, company_name, domain_name FROM users WHERE email=%s"""
+        sql = """SELECT
+                user_id,
+                first_name,
+                last_name,
+                email, type,
+                company_name,
+                domain_name
+
+                FROM users WHERE email=%s"""
         conn = None
         user = None
         count = 0
