@@ -82,7 +82,7 @@ class UserRegister(Resource):
         password = data['password']
         user_object = UserModel(email, password)
         # check if user already exixsts
-        new_user = user_object.check_if_user_exists(email)
+        new_user = user_object.check_if_user_exists_by_email(email)
         if new_user == 0:
             new_user = user_object.add_user(email, password)
             return send_success('user created', new_user, status.HTTP_201_CREATED)
