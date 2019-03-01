@@ -256,3 +256,23 @@ class UserModel():
                 conn.close()
 
         return user
+
+    @classmethod
+    def get_access_level(cls, user_id, team_id):
+        sql = """SELECT access_level FROM user_access_level WHERE
+                user_id=%s;"""
+        conn = None
+        access_level = None
+        try:
+            conn, cur = db.connect()
+            cur.execute(sql, (user_id,))
+            access_level = cur.fetchall()
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return access_level
