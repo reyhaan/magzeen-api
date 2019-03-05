@@ -9,3 +9,10 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return send_success('Token created', {'access_token': new_token}, status.HTTP_200_OK)
+
+class FreshToken(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=True)
+        return send_success('Token created', {'access_token': new_token}, status.HTTP_200_OK)

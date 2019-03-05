@@ -4,7 +4,7 @@ from flask_restful import Resource, reqparse
 from flask_api import status
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_claims, get_raw_jwt
 from models.userModel import UserModel
-from utils.reponseUtils import send_error, send_success, DateTimeEncoder
+from utils.reponseUtils import send_error, send_success
 from blacklist import BLACKLIST
 
 class UserLogin(Resource):
