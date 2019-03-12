@@ -39,8 +39,8 @@ class UserLogin(Resource):
             if user == 0:
                 return send_error('either email/password is not correct', status.HTTP_401_UNAUTHORIZED)
             else:
-                access_token = create_access_token(identity=email, fresh=True)
-                refresh_token = create_refresh_token(identity=email)
+                access_token = create_access_token(identity=user['user_id'], fresh=True)
+                refresh_token = create_refresh_token(identity=user['user_id'])
                 return send_success(
                     'success',
                     {

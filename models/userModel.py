@@ -33,13 +33,13 @@ class UserModel():
         self.company_name = company_name
 
     @classmethod
-    def get_user_type(cls, email):
-        sql = """SELECT type FROM users WHERE email=%s"""
+    def get_user_type(cls, id):
+        sql = """SELECT type FROM users WHERE user_id=%s"""
         conn = None
         user_type = None
         try:
             conn, cur = db.connect()
-            cur.execute(sql, (email,))
+            cur.execute(sql, (id,))
             user_type = cur.fetchone()['type']
             conn.commit()
             cur.close()
