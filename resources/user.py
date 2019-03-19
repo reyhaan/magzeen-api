@@ -5,6 +5,7 @@ from flask_api import status
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_claims, get_raw_jwt
 from models.userModel import UserModel
 from utils.reponseUtils import send_error, send_success
+from utils.authorizationProvider import roles_accepted
 from blacklist import BLACKLIST
 
 class UserLogin(Resource):
@@ -94,6 +95,7 @@ class User(Resource):
     user_object = UserModel()
 
     @jwt_required
+    @roles_accepted(['viewer', 'admin', 'contributor'])
     def get(self, id):
         # handle claims
         claims = get_jwt_claims()

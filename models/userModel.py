@@ -18,8 +18,7 @@ class UserModel():
         _type=None,
         first_name=None,
         last_name=None,
-        domain_name=None,
-        company_name=None
+        domain_name=None
     ):
         # user_id
         # created_at
@@ -30,7 +29,6 @@ class UserModel():
         self.first_name = first_name
         self.last_name = last_name
         self.domain_name = domain_name
-        self.company_name = company_name
 
     @classmethod
     def get_user_type(cls, id):
@@ -59,7 +57,6 @@ class UserModel():
                 first_name,
                 last_name,
                 type,
-                company_name,
                 domain_name
 
                 FROM users WHERE user_id=%s"""
@@ -166,7 +163,6 @@ class UserModel():
                 first_name,
                 last_name,
                 email, type,
-                company_name,
                 domain_name
 
                 FROM users WHERE email=%s"""
